@@ -1,1 +1,1 @@
-Repo with predictive models for Australian Football League (footy)
+Repo for footy models
