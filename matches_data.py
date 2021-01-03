@@ -4,14 +4,17 @@ Created on Thu Dec 31 13:44:24 2020
 
 @author: bradmorris
 """
+
+path='C:/Users/bradmorris/Documents/StubHub/Projects/AFL'
+seasons=range(1980,2021)
+
 import pandas as pd
 
-# use scraper for afltables.com.au by Michael Milton https://github.com/TMiguelT/AflTablesScraper
+# use scraper to pull data from afltables.com.au 
+# credit: Michael Milton https://github.com/TMiguelT/AflTablesScraper
 from afl_tables import MatchScraper
-
 afl = []
-
-for season in range(1980,2020):
+for season in seasons:
     rounds = MatchScraper.scrape(season)
     for round in range(len(rounds)):
         for match in range(len(rounds[round].matches)):
@@ -40,22 +43,9 @@ for season in range(1980,2020):
                 mawayscore=rounds[round].matches[match].teams[1].scores[3].score
             afl.append([mseason,mround,mdate,mvenue,mcrowd,mwinner,mhome,mhomegoals,mhomebehinds,mhomescore,maway,mawaygoals,mawaybehinds,mawayscore])
 
+afl = pd.DataFrame(afl,columns=['season','round','date','venue','crowd','winner','home','homegoals','homebehinds','homescore','away','awaygoals','awaybehinds','awayscore'])
+afl.to_csv(path+'/match_data_'+str(seasons[0])+'_'+str(seasons[-1])+'.csv',index=False)
 
-df = pd.DataFrame(afl,columns=['season','round','date','venue','crowd','winner','home','homegoals','homebehinds','homescore','away','awaygoals','awaybehinds','awayscore'])
-df.head()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# output distinct venue list to add latitude/longitude for each venue (and team)
+#venues=afl['venue'].drop_duplicates().sort_values()
+#venues.to_csv(path+'/venues.csv')
