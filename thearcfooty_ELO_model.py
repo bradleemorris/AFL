@@ -10,6 +10,7 @@ path='C:/Users/bradmorris/Documents/StubHub/Projects/AFL'
 import numpy as np
 import pandas as pd
 import datetime as dttm
+import pytz
 
 # ELO rating model from thearcfooty.com
 
@@ -65,7 +66,7 @@ def calc_elos(dt,tm1,tm2,tm1score,tm2score):
     new_elos=[get_elo(dt,tm1)+delta,get_elo(dt,tm2)-delta]
     return pred, margin, new_elos
 
-# Generate predicitons and update ELO ratings
+# Generate predictions and update ELO ratings
 predictions=[]
 for index, row in matches.iterrows():
     if row['away']=='Bye':
@@ -77,13 +78,25 @@ for index, row in matches.iterrows():
         elo_upd2=[row['away'],row['date'],new_elos[1]]
         elo_update=pd.DataFrame([elo_upd1,elo_upd2],columns=['team','date','ELO_rating'])
         elo=elo.append(elo_update) # ELO ratings need to be updated within loop
-    predictions.append([pred,margin,new_elos[0],new_elos[1]])
+    predictions.append([pred,margin])
 
 # Create dataframe for predicted result and margin for each match
-predictions=pd.DataFrame(predictions,columns=['pred_result','pred_margin','new_ELO_home','new_ELO_away'])
+predictions=pd.DataFrame(predictions,columns=['pred_result','pred_margin'])
 
 # Output predictions for inspection
 matches.join(predictions).to_csv(path+'/match_data_test.csv',index=False)
+
+
+# Plot ELO scores for 2016 season
+import matplotlib.pyplot as plt
+
+x=[dttm.datetime(2016,1,1,tzinfo=pytz.UTC)+dttm.timedelta(days=i) for i in range(365)]
+y1=[get_elo(i,'Sydney') for i in x]
+y2=[get_elo(i,'Geelong') for i in x]
+y3=[get_elo(i,'Hawthorn') for i in x]
+
+plt.plot(x,y1,'r',x,y2,'b',x,y3,'y')
+plt.show()
 
 
 
